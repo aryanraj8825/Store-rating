@@ -1,8 +1,38 @@
-# ⭐ Store Rating Platform
+# ⭐ Storefront Ratings
 
-A full-stack **role-based store rating platform** where users can discover stores and submit ratings from **1 to 5 stars**, administrators can manage users and stores, and store owners can monitor ratings and see who rated their store.
+A full-stack, role-based store rating platform where users can discover stores and rate them from **1 to 5 stars**, store owners can view ratings and the users who submitted them, and administrators can add and view users and stores.
 
-Built with **React, Express.js, PostgreSQL, JWT authentication, and Zod validation**.
+**Built with:** React (Vite), Express.js, PostgreSQL, JWT Authentication, Zod, and bcryptjs.
+
+<!--
+Add screenshots here once you have them:
+
+## 📸 Screenshots
+![Landing page](docs/landing.png)
+![Store listing](docs/stores.png)
+![Admin dashboard](docs/admin-dashboard.png)
+-->
+
+---
+
+## 📋 Overview
+
+Storefront Ratings provides different capabilities based on the user's role:
+
+```text
+                         ┌──────────────────────┐
+                         │  Storefront Ratings  │
+                         └──────────┬───────────┘
+                                    │
+              ┌─────────────────────┼─────────────────────┐
+              │                     │                     │
+              ▼                     ▼                     ▼
+        👨‍💼 Administrator      👤 Normal User       🏪 Store Owner
+              │                     │                     │
+        Add users             Discover stores       View ratings
+        Add stores            Submit ratings        View raters
+        View statistics       Modify ratings        View average
+```
 
 ---
 
@@ -10,187 +40,179 @@ Built with **React, Express.js, PostgreSQL, JWT authentication, and Zod validati
 
 ### 👨‍💼 Administrator
 
-- 📊 Dashboard with total users, stores, and ratings
-- 👤 Create users with different roles
-- 🏪 Add and manage stores
-- 🔎 Search and filter users and stores
-- ↕️ Sort data by supported fields
-- 👀 View detailed user information
-- ⭐ View store ratings associated with store owners
+- Dashboard showing total users, stores, and submitted ratings
+- Create users with different roles:
+  - Administrator
+  - Store Owner
+  - Normal User
+- Create stores and optionally assign a store owner
+- View users in a filterable and sortable list
+- View stores in a filterable and sortable list
+- View detailed information about a user
+- Store owners' details include their store rating information
+- Change password
+- Logout
 
 ### 👤 Normal User
 
-- 📝 Sign up and log in
-- 🔍 Search stores by name or address
-- ⭐ Submit a rating from 1–5
-- ✏️ Modify an existing rating
-- 📊 View overall store rating
-- 👤 View their own rating
-- 🔐 Change password
-- 🚪 Secure logout
+- Create an account
+- Log in
+- Search stores by name and address
+- Sort the store listing
+- View each store's overall rating
+- View their own rating
+- Submit a rating from **1 to 5 stars**
+- Modify an existing rating
+- Change password
+- Logout
 
 ### 🏪 Store Owner
 
-- 🔐 Secure login
-- 📊 View average store rating
-- ⭐ View rating statistics
-- 👥 See users who rated their store
-- 🔐 Change password
-- 🚪 Secure logout
+- Log in
+- View the average rating of their store
+- View the total number of ratings
+- View the users who rated their store
+- Sort the list of users who submitted ratings
+- Change password
+- Logout
 
 ### 🌐 Public
 
-- Landing page for signed-out visitors
-- Common authentication flow for all roles
-- Role-based redirection after login
+- Public landing page for signed-out visitors
+- Shared login page for all roles
+- Automatic role-based redirection after login
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Frontend
-
-- **React**
-- **Vite**
-- JavaScript
-- Responsive UI
-
-### Backend
-
-- **Node.js**
-- **Express.js**
-- RESTful APIs
-- JWT Authentication
-- bcrypt Password Hashing
-- Zod Validation
-
-### Database
-
-- **PostgreSQL**
-- `pg` Node.js PostgreSQL client
-- Relational data modeling
-- Foreign keys and unique constraints
-
-### Development
-
-- npm
-- Nodemon
-- Git & GitHub
+| Layer | Technologies |
+|---|---|
+| Frontend | React 18, Vite, React Router, CSS |
+| Backend | Node.js, Express.js, REST API |
+| Authentication | JWT, bcryptjs |
+| Security | Helmet, CORS, express-rate-limit |
+| Validation | Zod |
+| Database | PostgreSQL, `pg` connection pool |
+| Development | npm, Nodemon, Git, GitHub |
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Application Architecture
 
 ```text
-┌─────────────────────────────┐
-│          React UI           │
-│        Vite Frontend        │
-└──────────────┬──────────────┘
-               │
-               │ REST API
-               ▼
-┌─────────────────────────────┐
-│       Express.js API        │
-│                             │
-│  Authentication Middleware  │
-│  Role-Based Authorization   │
-│  Zod Validation             │
-│  Business Logic             │
-└──────────────┬──────────────┘
-               │
-               │ pg
-               ▼
-┌─────────────────────────────┐
-│         PostgreSQL          │
-│                             │
-│ Users │ Stores │ Ratings    │
-└─────────────────────────────┘
+┌─────────────────────────────────┐
+│          React Frontend         │
+│             Vite                │
+│                                 │
+│  Pages • Components • Auth      │
+└───────────────┬─────────────────┘
+                │
+                │ REST API
+                │ JSON + JWT
+                ▼
+┌─────────────────────────────────┐
+│         Express.js API          │
+│                                 │
+│ Authentication Middleware       │
+│ Role-Based Authorization        │
+│ Zod Validation                  │
+│ Route Handlers                  │
+│ SQL Queries                     │
+└───────────────┬─────────────────┘
+                │
+                │ pg Connection Pool
+                ▼
+┌─────────────────────────────────┐
+│          PostgreSQL             │
+│                                 │
+│   Users │ Stores │ Ratings      │
+└─────────────────────────────────┘
 ```
 
 ---
 
 ## 🔐 Authentication & Authorization
 
-The application uses **JWT-based authentication**.
+The application uses **JWT bearer-token authentication**.
 
-Each authenticated request is associated with a user and role.
+JWTs contain the authenticated user's:
 
-Supported roles:
+- User ID
+- Role
 
-```text
-ADMIN
-USER
-OWNER
-```
+The backend verifies authentication and role permissions before allowing access to protected routes.
 
-Server-side middleware ensures that users can only access endpoints authorized for their role.
+### Role Access
 
-For example:
+| Role | Access |
+|---|---|
+| `ADMIN` | Dashboard, add and view users and stores |
+| `USER` | Store listing and ratings |
+| `OWNER` | Store-owner dashboard |
 
-```text
-ADMIN  → Admin Dashboard
-USER   → Store Listing & Ratings
-OWNER  → Store Analytics
-```
+### Password Security
 
-Passwords are securely hashed using **bcrypt** and are never stored as plain text.
+Passwords are hashed using **bcryptjs** and are never stored as plain text.
+
+Public signup always creates a **normal user**. Users cannot register themselves as administrators or store owners.
+
+Only administrators can create accounts with elevated roles.
 
 ---
 
 ## ⭐ Rating System
 
-Users can rate a store from **1 to 5 stars**.
+A normal user can submit a rating between **1 and 5 stars** for a store.
 
 Each user can have only **one rating per store**.
 
-The database enforces this using:
+This is enforced at the database level using:
 
 ```sql
 UNIQUE (user_id, store_id)
 ```
 
-If a user submits another rating for the same store, the existing rating is updated instead of creating a duplicate.
-
-Example:
+If a user rates the same store again, the existing rating is updated rather than creating a duplicate record.
 
 ```text
-User A → Store X → ⭐⭐⭐⭐⭐
+First rating:
+
+User A ──────► Store X ──────► ⭐⭐⭐⭐⭐
+
+Updated rating:
+
+User A ──────► Store X ──────► ⭐⭐⭐⭐
 ```
 
-If User A changes the rating:
-
-```text
-User A → Store X → ⭐⭐⭐⭐
-```
-
-The original rating is updated.
+This ensures that store averages are calculated using distinct user ratings.
 
 ---
 
-## ✅ Validation Rules
+## ✅ Validation
 
-Validation is implemented on both the **frontend and backend**.
+Validation is performed on both the frontend and backend.
 
-| Field | Rule |
+The backend remains the final source of truth.
+
+| Field | Validation |
 |---|---|
-| Name | 20–60 characters |
+| User Name | 20–60 characters |
 | Address | Maximum 400 characters |
 | Password | 8–16 characters |
-| Password | At least 1 uppercase letter |
-| Password | At least 1 special character |
+| Password | At least one uppercase letter |
+| Password | At least one special character |
 | Email | Valid email format |
-| Rating | Integer between 1–5 |
+| Rating | Integer from 1–5 |
 | Store Name | 1–100 characters |
 
-> The 20–60 character name rule applies to users. Store names use a separate 1–100 character rule.
-
-Backend validation is handled using **Zod**.
+The **20–60 character rule applies to user names**. Store names use a separate 1–100 character rule.
 
 ---
 
 ## 🔎 Search, Filtering & Sorting
 
-List endpoints support:
+The application supports filtering and sorting for list endpoints.
 
 ### Filters
 
@@ -212,14 +234,16 @@ order=desc
 Example:
 
 ```http
-GET /api/admin/users?name=rahul&role=USER&sortBy=name&order=asc
+GET /api/admin/users?name=sharma&role=USER&sortBy=name&order=asc
 ```
 
-Database queries use parameterized values and whitelisted sort fields to reduce the risk of SQL injection.
+Filter values are parameterized and sorting fields are restricted to an allowed whitelist.
+
+This helps protect database queries against SQL injection.
 
 ---
 
-## 📡 API Endpoints
+## 📡 REST API
 
 ### Authentication
 
@@ -235,11 +259,9 @@ Database queries use parameterized values and whitelisted sort fields to reduce 
 | Method | Endpoint | Access |
 |---|---|---|
 | GET | `/api/admin/dashboard` | Admin |
-| GET | `/api/admin/users` | Admin |
-| POST | `/api/admin/users` | Admin |
+| GET, POST | `/api/admin/users` | Admin |
 | GET | `/api/admin/users/:id` | Admin |
-| GET | `/api/admin/stores` | Admin |
-| POST | `/api/admin/stores` | Admin |
+| GET, POST | `/api/admin/stores` | Admin |
 | GET | `/api/admin/owners` | Admin |
 
 ### Stores & Ratings
@@ -255,72 +277,111 @@ Database queries use parameterized values and whitelisted sort fields to reduce 
 |---|---|---|
 | GET | `/api/owner/dashboard` | Owner |
 
+### Health Check
+
+```http
+GET /api/health
+```
+
 ---
 
 ## 📁 Project Structure
 
 ```text
-store-rating-platform/
+store-rating-app/
 │
 ├── backend/
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── middleware/
-│   │   ├── routes/
-│   │   ├── validators/
-│   │   ├── db/
-│   │   └── server.js
-│   │
+│   ├── schema.sql
+│
 │   ├── scripts/
 │   │   ├── initDb.js
 │   │   └── seed.js
+│
+│   ├── src/
+│   │   ├── app.js
+│   │   ├── server.js
+│   │   ├── config.js
+│   │   ├── db.js
+│   │   ├── listing.js
+│   │   ├── validators.js
 │   │
+│   │   ├── middleware/
+│   │   │   ├── auth.js
+│   │   │   ├── validate.js
+│   │   │   └── error.js
+│   │
+│   │   └── routes/
+│   │       ├── auth.js
+│   │       ├── admin.js
+│   │       ├── stores.js
+│   │       └── owner.js
+│
 │   ├── .env.example
-│   ├── package.json
-│   └── ...
+│   └── package.json
 │
 ├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   └── ...
-│   │
-│   ├── package.json
-│   └── ...
+│   ├── index.html
+│   ├── vite.config.js
+│
+│   └── src/
+│       ├── App.jsx
+│       ├── main.jsx
+│       ├── api.js
+│       ├── auth.jsx
+│       ├── hooks.js
+│       ├── validators.js
+│
+│       ├── components/
+│       │   ├── Layout
+│       │   ├── DataTable
+│       │   ├── Stars
+│       │   ├── AuthShell
+│       │   └── ...
+│
+│       └── pages/
+│           ├── Landing
+│           ├── Login
+│           ├── Signup
+│           ├── Admin*
+│           ├── UserStores
+│           └── OwnerDashboard
 │
 └── README.md
 ```
 
-> Folder names may vary slightly depending on the current implementation.
-
 ---
 
-# ⚙️ Installation & Setup
+## ⚙️ Installation & Setup
 
-## Prerequisites
+### Prerequisites
 
-Make sure you have installed:
+Make sure the following are installed:
 
-- **Node.js 18+**
-- **PostgreSQL**
-- **npm**
-- **Git**
+- Node.js **18+**
+- PostgreSQL
+- npm
+- Git
 
----
-
-## 1. Clone the repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
 cd YOUR_REPOSITORY
 ```
 
----
+### 2. Create PostgreSQL Database
 
-# 🗄️ Backend Setup
+Create the database:
 
-Open a terminal:
+```bash
+createdb store_ratings
+```
+
+Alternatively, create `store_ratings` using **pgAdmin** or another PostgreSQL client.
+
+### 3. Configure Backend
+
+Navigate to the backend:
 
 ```bash
 cd backend
@@ -332,43 +393,19 @@ Install dependencies:
 npm install
 ```
 
----
+Create your `.env` file using `.env.example`.
 
-## 2. Configure Environment Variables
-
-Create a `.env` file from the example:
-
-```bash
-cp .env.example .env
-```
-
-On Windows PowerShell, you can also simply create a `.env` file manually.
-
-Configure:
+Example:
 
 ```env
-DATABASE_URL=postgresql://username:password@localhost:5432/store_ratings
-JWT_SECRET=your_secure_jwt_secret
 PORT=4000
+DATABASE_URL=postgresql://username:password@localhost:5432/store_ratings
+JWT_SECRET=your_long_random_secret
+JWT_EXPIRES_IN=8h
+CORS_ORIGIN=http://localhost:5173
 ```
 
-> Never commit your `.env` file to GitHub.
-
----
-
-## 3. Create the Database
-
-Create a PostgreSQL database:
-
-```bash
-createdb store_ratings
-```
-
-Or create it through **pgAdmin** / PostgreSQL tools.
-
----
-
-## 4. Initialize & Seed the Database
+### 4. Initialize Database
 
 Run:
 
@@ -376,61 +413,53 @@ Run:
 npm run db:setup
 ```
 
-This will:
+This initializes the database schema and inserts the sample data.
 
-1. Create the required tables
-2. Configure database constraints
-3. Insert sample data
+> ### ⚠️ Important
+>
+> `db:setup` drops and recreates the tables, so it erases any existing data. Use it only with a fresh or disposable database.
 
----
+If you only want to insert the sample data without resetting the database:
 
-## 5. Start the Backend
+```bash
+npm run db:seed
+```
+
+### 5. Start Backend
 
 ```bash
 npm run dev
 ```
 
-Backend will run at:
+Backend:
 
 ```text
 http://localhost:4000
 ```
 
----
+### 6. Start Frontend
 
-# 💻 Frontend Setup
-
-Open a **second terminal**:
+Open a second terminal:
 
 ```bash
 cd frontend
-```
-
-Install dependencies:
-
-```bash
 npm install
-```
-
-Start the development server:
-
-```bash
 npm run dev
 ```
 
-Frontend will run at:
+Frontend:
 
 ```text
 http://localhost:5173
 ```
 
-The frontend proxies API requests to the backend.
+During development, Vite proxies `/api` requests to the Express backend.
 
 ---
 
-# 🔑 Demo Accounts
+## 🔑 Demo Accounts
 
-The seed script provides the following demo accounts:
+The database seed script creates the following accounts:
 
 | Role | Email | Password |
 |---|---|---|
@@ -438,41 +467,52 @@ The seed script provides the following demo accounts:
 | Store Owner | `owner@example.com` | `Owner@1234` |
 | Normal User | `user@example.com` | `User@1234` |
 
-⚠️ **These credentials are for development/demo purposes only. Change or remove them before deploying the application publicly.**
+> ⚠️ These credentials are intended for development and demonstration only. Change or remove them before any public deployment.
+
+The seeded store owner is associated with **Corner Cafe**. A store owner's dashboard stays empty until an administrator assigns a store to that owner.
 
 ---
 
-# 🔒 Security Considerations
+## 🔒 Security
 
-The project includes several security measures:
+### Implemented
 
-- JWT-based authentication
-- bcrypt password hashing
-- Role-based authorization
+- JWT authentication
+- Server-side role-based authorization
+- bcryptjs password hashing
 - Zod request validation
+- Request body size limits
 - Parameterized SQL queries
-- Whitelisted sorting fields
-- Protected API routes
-- Environment variables for secrets
-- Unique database constraints
-
-For production deployment, additional measures should be considered, including:
-
-- HTTPS
-- Secure cookie configuration
-- Rate limiting
-- CORS restrictions
-- Strong production secrets
-- Refresh-token strategy
-- Security headers
+- Whitelisted sorting columns
+- Helmet security headers
+- Rate limiting on signup and login
+- CORS restricted to the configured frontend origin
 - Centralized error handling
-- Database connection pooling
+- PostgreSQL connection pooling
+- Database foreign-key constraints
+- Unique constraints
+- Check constraints
+- Secrets stored through environment variables
+
+### Production Considerations
+
+Before deploying publicly:
+
+- Use HTTPS
+- Generate a strong, unique `JWT_SECRET`
+- Consider moving authentication tokens to `httpOnly` cookies
+- Consider implementing refresh tokens
+- Add automated tests
+- Configure production database credentials
+- Configure production CORS origins
+
+> The current frontend stores the JWT in `localStorage`. This is convenient for development but has greater XSS exposure than an `httpOnly` cookie-based approach. Logout clears the token in the browser but does not invalidate it on the server.
 
 ---
 
-# 🧪 Example User Flow
+## 🧪 User Flows
 
-### Normal User
+### 👤 Normal User
 
 ```text
 Sign Up
@@ -483,14 +523,14 @@ Browse Stores
    ↓
 Search / Sort
    ↓
-Open Store
+View Store Rating
    ↓
-Submit Rating ⭐
+Submit 1–5 Star Rating
    ↓
-Modify Rating if needed
+Modify Rating Later
 ```
 
-### Store Owner
+### 🏪 Store Owner
 
 ```text
 Login
@@ -499,99 +539,96 @@ Owner Dashboard
    ↓
 View Average Rating
    ↓
-View Rating Distribution
+View Rating Count
    ↓
 View Users Who Rated
 ```
 
-### Administrator
+### 👨‍💼 Administrator
 
 ```text
 Login
    ↓
 Admin Dashboard
    ↓
-View Statistics
+View Platform Statistics
    ↓
-Manage Users
+Add Users
    ↓
-Manage Stores
+Add Stores
+   ↓
+Filter / Sort Data
    ↓
 View User Details
 ```
 
 ---
 
-# 📌 Design Decisions
+## 📌 Key Design Decisions
 
 ### One Rating Per User & Store
 
-The `ratings` table uses:
+A database-level unique constraint prevents duplicate ratings:
 
 ```sql
 UNIQUE (user_id, store_id)
 ```
 
-This prevents duplicate ratings.
-
 ### Server-Side Authorization
 
-Role restrictions are enforced on the backend rather than relying only on frontend route protection.
+Frontend route protection improves the user experience, but it is **not trusted for security**.
 
-### Parameterized Queries
+Every protected API endpoint verifies the user's role on the server.
 
-User-provided filter values are parameterized before being sent to PostgreSQL.
+### Safe Filtering & Sorting
 
-### Whitelisted Sorting
+Filter values are parameterized and sorting columns are selected from a predefined whitelist.
 
-Only approved database columns can be used for sorting, preventing arbitrary SQL fragments from being injected through `sortBy`.
+### Restricted Public Signup
 
-### Signup Restrictions
+Public signup always creates a normal user.
 
-Public signup always creates a **normal user**.
+Only administrators can create administrator and store-owner accounts.
 
-Only administrators can create:
+### Shared Validation
 
-- Administrators
-- Store Owners
-
-This prevents users from granting themselves elevated privileges.
+Frontend validation provides immediate feedback, while backend validation remains authoritative.
 
 ---
 
-# 📈 Future Improvements
+## 📈 Future Improvements
 
-Potential enhancements for future versions:
+Potential improvements for future versions:
 
-- 📊 Advanced rating analytics
-- 📧 Email notifications
-- 🔔 In-app notifications
-- 🌙 Dark mode
-- 📱 Improved mobile experience
-- 🖼️ Store images and profiles
-- 📍 Location-based store discovery
-- ⭐ Rating distribution charts
-- 🧾 Export reports as CSV/PDF
-- 🔄 Refresh-token authentication
-- 🚀 Production deployment with CI/CD
+- Edit and delete users and stores
+- Rating distribution charts
+- More detailed store-owner analytics
+- Store detail pages with images
+- Email notifications
+- In-app notifications
+- Refresh-token authentication
+- CSV/PDF report exports
+- Automated testing
+- CI/CD pipeline
+- Dark mode
+- Location-based store discovery
 
 ---
 
-# 🎯 Learning Outcomes
+## 🎯 Learning Outcomes
 
 This project demonstrates practical experience with:
 
-- Full-stack web development
-- REST API design
+- Full-stack development using React and Express
+- REST API development
+- PostgreSQL relational database design
 - JWT authentication
 - Role-Based Access Control (RBAC)
-- PostgreSQL relational database design
-- SQL queries and constraints
-- React application development
-- API integration
-- Input validation
-- Password security
+- Password hashing and security
+- Zod-based input validation
+- SQL queries and database constraints
 - Search, filtering and sorting
+- Frontend/backend API integration
 - Git and GitHub workflow
 
 ---
@@ -602,10 +639,8 @@ This project demonstrates practical experience with:
 
 B.Tech — Computer Science & Engineering (AI & ML)
 
-Built as a full-stack role-based store rating platform using **React + Express + PostgreSQL**.
-
 ---
 
-## ⭐ If You Like This Project
+## ⭐ Support
 
-If this project helped you or you found it useful, consider giving the repository a ⭐ on GitHub.
+If you found this project useful, consider giving the repository a ⭐ on GitHub.
